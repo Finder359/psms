@@ -1,0 +1,10 @@
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\bpm\api\factory\BpmBaseExtAPIFallbackFactory.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\system\api\factory\SysBaseAPIFallbackFactory.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\online\api\IOnlineBaseExtAPI.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\system\api\fallback\SysBaseAPIFallback.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\bpm\api\IBpmBaseExtAPI.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\bpm\api\fallback\BpmBaseExtAPIFallback.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\config\FeignConfig.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\online\api\fallback\OnlineBaseExtAPIFallback.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\system\api\ISysBaseAPI.java
+C:\Users\Administrator\Desktop\FromSVN\psms\jeecg-boot-base\jeecg-boot-base-api\jeecg-system-cloud-api\src\main\java\org\jeecg\common\online\api\factory\OnlineBaseExtAPIFallbackFactory.java

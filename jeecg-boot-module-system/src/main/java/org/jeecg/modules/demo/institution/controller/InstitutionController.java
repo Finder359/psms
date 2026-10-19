@@ -39,15 +39,11 @@ public class InstitutionController extends JeecgController<Institution, Institut
                                    @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                                    HttpServletRequest req) {
-        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        int fidRegion = sysUser.getFidRegion();
-        if(fidRegion==0){
-            return Result.error("账号权限异常，请联系管理员");
-        }
+        Integer fidRegion = resolveFidRegion();
 
         Page<Institution> page = new Page<Institution>(pageNo, pageSize);
         QueryWrapper<Institution> qw = new QueryWrapper<>();
-        if(fidRegion!=1024){
+        if(fidRegion != null && fidRegion != 1024){
             qw.eq("fid_region",fidRegion);
         }
         qw.orderByDesc("create_time");
@@ -59,6 +55,16 @@ public class InstitutionController extends JeecgController<Institution, Institut
             List<Institution> pageList = institutionService.list(qw);
             return Result.OK(pageList);
         }
+    }
+
+    private Integer resolveFidRegion() {
+        Object principal = SecurityUtils.getSubject().getPrincipal();
+        if (!(principal instanceof LoginUser)) {
+            return null;
+        }
+        LoginUser sysUser = (LoginUser) principal;
+        int fidRegion = sysUser.getFidRegion();
+        return fidRegion > 0 ? fidRegion : null;
     }
 
     /**

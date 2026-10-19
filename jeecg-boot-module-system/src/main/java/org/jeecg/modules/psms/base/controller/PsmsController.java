@@ -311,11 +311,14 @@ public class PsmsController {
     @GetMapping(value = "/statCompanyExcessive")
     public Result<?> statCompanyExcessive() {
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        int fidRegion = sysUser.getFidRegion();
+        int fidRegion = sysUser == null ? 0 : sysUser.getFidRegion();
+        if (fidRegion == 0) {
+            return Result.OK(getEmptyExcessiveMap());
+        }
 
-        String tableLampblack = "bu_lampblack_data" + "_"+ fidRegion + "_today";
-        Map<String,Object>map = psmsService.statCompanyExcessive(tableLampblack,fidRegion);
-        return Result.OK(map);
+        String tableLampblack = "bu_lampblack_data" + "_" + fidRegion + "_today";
+        Map<String, Object> map = psmsService.statCompanyExcessive(tableLampblack, fidRegion);
+        return Result.OK(normalizeExcessiveMap(map));
     }
 
     /**
@@ -326,11 +329,34 @@ public class PsmsController {
     @GetMapping(value = "/statPointExcessive")
     public Result<?> statPointExcessive() {
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        int fidRegion = sysUser.getFidRegion();
+        int fidRegion = sysUser == null ? 0 : sysUser.getFidRegion();
+        if (fidRegion == 0) {
+            return Result.OK(getEmptyExcessiveMap());
+        }
 
-        String tableLampblack = "bu_lampblack_data" + "_"+ fidRegion + "_today";
-        Map<String,Object>map = psmsService.statPointExcessive(tableLampblack,fidRegion);
-        return Result.OK(map);
+        String tableLampblack = "bu_lampblack_data" + "_" + fidRegion + "_today";
+        Map<String, Object> map = psmsService.statPointExcessive(tableLampblack, fidRegion);
+        return Result.OK(normalizeExcessiveMap(map));
+    }
+
+    private Map<String, Object> getEmptyExcessiveMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a1", 0);
+        map.put("a2", 0);
+        return map;
+    }
+
+    private Map<String, Object> normalizeExcessiveMap(Map<String, Object> map) {
+        Map<String, Object> normalized = map == null ? new LinkedHashMap<>() : map;
+        normalized.putIfAbsent("a1", 0);
+        normalized.putIfAbsent("a2", 0);
+        if (normalized.get("a1") == null) {
+            normalized.put("a1", 0);
+        }
+        if (normalized.get("a2") == null) {
+            normalized.put("a2", 0);
+        }
+        return normalized;
     }
 
 

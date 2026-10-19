@@ -39,16 +39,12 @@ public class ManufacturerController extends JeecgController<Manufacturer, Manufa
                                    @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                                    HttpServletRequest req) {
-        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        int fidRegion = sysUser.getFidRegion();
-        if(fidRegion==0){
-            return Result.error("账号权限异常，请联系管理员");
-        }
+        Integer fidRegion = resolveFidRegion();
 
         Page<Manufacturer> page = new Page<>(pageNo, pageSize);
         QueryWrapper<Manufacturer> qw = new QueryWrapper<>();
-        if(fidRegion!=1024){
-            //qw.eq("fid_region",fidRegion);
+        if(fidRegion != null && fidRegion != 1024){
+            qw.eq("fid_region", fidRegion);
         }
         qw.orderByDesc("create_time");
         if(null!=isPage && isPage){
@@ -58,6 +54,16 @@ public class ManufacturerController extends JeecgController<Manufacturer, Manufa
             List<Manufacturer> pageList = manufacturerService.list(qw);
             return Result.OK(pageList);
         }
+    }
+
+    private Integer resolveFidRegion() {
+        Object principal = SecurityUtils.getSubject().getPrincipal();
+        if (!(principal instanceof LoginUser)) {
+            return null;
+        }
+        LoginUser sysUser = (LoginUser) principal;
+        int fidRegion = sysUser.getFidRegion();
+        return fidRegion > 0 ? fidRegion : null;
     }
 
     /**

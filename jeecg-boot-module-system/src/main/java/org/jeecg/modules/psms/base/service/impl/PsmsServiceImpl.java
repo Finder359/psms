@@ -252,12 +252,27 @@ public class PsmsServiceImpl extends ServiceImpl<PsmsMapper, Map<String,Object>>
 
     @Override
     public Map<String, Object> statCompanyExcessive(String tableLampblack, int fidRegion) {
-        return baseMapper.statCompanyExcessive(tableLampblack,fidRegion);
+        Map<String, Object> result = baseMapper.statCompanyExcessive(tableLampblack, fidRegion);
+        return normalizeExcessiveMap(result);
     }
 
     @Override
     public Map<String, Object> statPointExcessive(String tableLampblack, int fidRegion) {
-        return baseMapper.statPointExcessive(tableLampblack,fidRegion);
+        Map<String, Object> result = baseMapper.statPointExcessive(tableLampblack, fidRegion);
+        return normalizeExcessiveMap(result);
+    }
+
+    private Map<String, Object> normalizeExcessiveMap(Map<String, Object> source) {
+        Map<String, Object> result = source == null ? new LinkedHashMap<>() : source;
+        result.putIfAbsent("a1", 0);
+        result.putIfAbsent("a2", 0);
+        if (result.get("a1") == null) {
+            result.put("a1", 0);
+        }
+        if (result.get("a2") == null) {
+            result.put("a2", 0);
+        }
+        return result;
     }
 
     @Override

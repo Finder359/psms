@@ -47,12 +47,7 @@ public class CompanyController extends JeecgController<Company, CompanyService> 
                                    @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
 
-        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-
-        int fidRegion = sysUser.getFidRegion();
-        if(fidRegion==0){
-            return Result.error("账号权限异常，请联系管理员");
-        }
+        Integer fidRegion = resolveFidRegion();
 
         Page<Company> page = new Page<Company>(pageNo, pageSize);
         QueryWrapper<Company> qw = new QueryWrapper<>();
@@ -72,7 +67,7 @@ public class CompanyController extends JeecgController<Company, CompanyService> 
             }
         }
 
-        if(fidRegion!=1024){
+        if(fidRegion != null && fidRegion != 1024){
             qw.eq("fid_region",fidRegion);
         }
 
@@ -84,6 +79,16 @@ public class CompanyController extends JeecgController<Company, CompanyService> 
             List<Company> pageList = companyService.list(qw);
             return Result.OK(pageList);
         }
+    }
+
+    private Integer resolveFidRegion() {
+        Object principal = SecurityUtils.getSubject().getPrincipal();
+        if (!(principal instanceof LoginUser)) {
+            return null;
+        }
+        LoginUser sysUser = (LoginUser) principal;
+        int fidRegion = sysUser.getFidRegion();
+        return fidRegion > 0 ? fidRegion : null;
     }
 
     @AutoLog(value = "餐饮企业-分页列表查询")
@@ -157,16 +162,14 @@ public class CompanyController extends JeecgController<Company, CompanyService> 
     @PostMapping(value = "/add")
     public Result<?> add(@RequestBody Company company) {
 
-        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        int fidRegion = sysUser.getFidRegion();
-        if(fidRegion==0){
-            return Result.error("账号权限异常，请联系管理员");
-        }
-        if(fidRegion==1024){
+        Integer fidRegion = resolveFidRegion();
+        if(fidRegion != null && fidRegion == 1024){
             return Result.error("管理员账号无法新增数据");
         }
+        if(fidRegion != null){
+            company.setFidRegion(fidRegion);
+        }
 
-        company.setFidRegion(fidRegion);
         companyService.save(company);
         return Result.OK(company.getId());
     }

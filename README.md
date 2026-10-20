@@ -1,195 +1,215 @@
-Jeecg-Boot 低代码开发平台
-===============
+﻿# PSMS 餐饮业油烟监控平台
 
-当前最新版本： 2.4.6（发布日期：20210813）
+这是一个基于 Jeecg-Boot 的餐饮油烟排放监管平台，覆盖餐饮企业接入、测点管理、实时监测、数据分析、预警处置和统计报表等核心业务，适用于市、区县级环境监管部门及服务厂商的运营场景。
 
+项目中已经集成了以 `psms` 业务模块为核心的后端代码，结合 MySQL + Redis 的数据基础设施，支持多区域权限、设备联网率统计、超标分析、运维工单等功能。
 
-## 后端技术架构
-- 基础框架：Spring Boot 2.3.5.RELEASE
+## 项目概述
 
-- 持久层框架：Mybatis-plus 3.4.3.1
+该系统重点解决餐饮业油烟治理过程中的以下问题：
 
-- 安全框架：Apache Shiro 1.7.0，Jwt 3.11.0
+- 餐饮企业台账及基础信息管理
+- 排口/测点/净化器设备接入管理
+- 油烟浓度、颗粒物、非甲烷总烃等实时数据监测
+- 设备运行状态、联网状态和异常告警分析
+- 超标单位、超标次数、运行时长等智能分析
+- 区域监管、企业分类统计、月度/年度趋势分析
+- 异常工单流转与监督闭环
 
-- 数据库连接池：阿里巴巴Druid 1.1.22
+## 业务模块
 
-- 缓存框架：redis
+当前后端代码主要位于：
 
-- 日志打印：logback
+- `jeecg-boot-module-system/src/main/java/org/jeecg/modules/psms/home`
+- `.../enterprise`
+- `.../base`
+- `.../operation`
+- `.../analyse`
+- `.../supervision`
+- `.../statement`
+- `.../workorder`
 
-- 其他：fastjson，poi，Swagger-ui，quartz, lombok（简化代码）等。
+关键业务模块说明：
 
+- `home`：首页概览、企业接入数、测点联网率、数据流量、区域统计
+- `enterprise`：企业档案、基础信息与接入管理
+- `base`：基础数据及公共配置
+- `operation`：运行分析、设备运行情况、经营时段统计
+- `analyse`：超标分析、趋势对比、设备分析
+- `supervision`：监督异常、告警统计、问题追踪
+- `statement`：统计报表与汇总分析
+- `workorder`：工单管理与处理闭环
 
+## 技术栈
 
-## 开发环境
+- Java 21
+- Spring Boot 2.7.18
+- Spring Cloud 2021.0.8
+- MyBatis-Plus 3.4.3.1
+- Apache Shiro 1.13.0 + JWT
+- Druid 连接池
+- Redis 缓存
+- MySQL 8.0
+- Maven 多模块构建
+- Knife4j / Swagger 接口文档
+- Quartz 定时任务
 
-- 语言：Java 8
+## 仓库结构
 
-- IDE(JAVA)： Eclipse安装lombok插件 或者 IDEA
-
-- 依赖管理：Maven
-
-- 数据库：MySQL5.7+  &  Oracle 11g & SqlServer & postgresql
-
-- 缓存：Redis
-
-
-## 技术文档
-
-
-- 在线演示 ：  [http://boot.jeecg.com](http://boot.jeecg.com)
-
-- 在线文档：  [http://doc.jeecg.com](http://doc.jeecg.com)
-
-- 常见问题：  [http://jeecg.com/doc/qa](http://jeecg.com/doc/qa)
-
-- QQ交流群 ：  ④774126647、③816531124、①284271917、②769925425
-
-
-## 专项文档
-
-#### 一、查询过滤器用法
-
-```
-QueryWrapper<?> queryWrapper = QueryGenerator.initQueryWrapper(?, req.getParameterMap());
-```
-
-代码示例：
-
-```
-
-	@GetMapping(value = "/list")
-	public Result<IPage<JeecgDemo>> list(JeecgDemo jeecgDemo, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo, 
-	                                     @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-			HttpServletRequest req) {
-		Result<IPage<JeecgDemo>> result = new Result<IPage<JeecgDemo>>();
-		
-		//调用QueryGenerator的initQueryWrapper
-		QueryWrapper<JeecgDemo> queryWrapper = QueryGenerator.initQueryWrapper(jeecgDemo, req.getParameterMap());
-		
-		Page<JeecgDemo> page = new Page<JeecgDemo>(pageNo, pageSize);
-		IPage<JeecgDemo> pageList = jeecgDemoService.page(page, queryWrapper);
-		result.setSuccess(true);
-		result.setResult(pageList);
-		return result;
-	}
-
-```
-
-
-
-- 查询规则 (本规则不适用于高级查询,高级查询有自己对应的查询类型可以选择 )
-
-| 查询模式           | 用法    | 说明                         |
-|---------- |-------------------------------------------------------|------------------|
-| 模糊查询     | 支持左右模糊和全模糊  需要在查询输入框内前或后带\*或是前后全部带\* |    |
-| 取非查询     | 在查询输入框前面输入! 则查询该字段不等于输入值的数据(数值类型不支持此种查询,可以将数值字段定义为字符串类型的) |    |
-| \>  \>= < <=     | 同取非查询 在输入框前面输入对应特殊字符即表示走对应规则查询 |    |
-| in查询     | 若传入的数据带,(逗号) 则表示该查询为in查询 |    |
-| 多选字段模糊查询     | 上述4 有一个特例，若某一查询字段前后都带逗号 则会将其视为走这种查询方式 ,该查询方式是将查询条件以逗号分割再遍历数组 将每个元素作like查询 用or拼接,例如 现在name传入值 ,a,b,c, 那么结果sql就是 name like '%a%' or name like '%b%' or name like '%c%' |    |
-
-
-#### 二、AutoPoi(EXCEL工具类-EasyPOI衍变升级重构版本）
- 
-  [在线文档](https://github.com/zhangdaiscott/autopoi)
-  
-
-
-#### 三、代码生成器
-
-> 功能说明：   一键生成的代码（包括：controller、service、dao、mapper、entity、vue）
- 
- - 模板位置： src/main/resources/jeecg/code-template
- - 技术文档： http://doc.jeecg.com/2043916
-
-
-
-#### 四、编码排重使用示例
-
-重复校验效果：
-![输入图片说明](https://static.oschina.net/uploads/img/201904/19191836_eGkQ.png "在这里输入图片标题")
-
-1.引入排重接口,代码如下:  
- 
-```
-import { duplicateCheck } from '@/api/api'
-  ```
-2.找到编码必填校验规则的前端代码,代码如下:  
-  
-```
-<a-input placeholder="请输入编码" v-decorator="['code', validatorRules.code ]"/>
-
-code: {
-            rules: [
-              { required: true, message: '请输入编码!' },
-              {validator: this.validateCode}
-            ]
-          },
-  ```
-3.找到rules里validator对应的方法在哪里,然后使用第一步中引入的排重校验接口.  
-  以用户online表单编码为示例,其中四个必传的参数有:  
-    
-```
-  {tableName:表名,fieldName:字段名,fieldVal:字段值,dataId:表的主键},
-  ```
- 具体使用代码如下:  
- 
-```
-    validateCode(rule, value, callback){
-        let pattern = /^[a-z|A-Z][a-z|A-Z|\d|_|-]{0,}$/;
-        if(!pattern.test(value)){
-          callback('编码必须以字母开头，可包含数字、下划线、横杠');
-        } else {
-          var params = {
-            tableName: "onl_cgreport_head",
-            fieldName: "code",
-            fieldVal: value,
-            dataId: this.model.id
-          };
-          duplicateCheck(params).then((res)=>{
-            if(res.success){
-             callback();
-            }else{
-              callback(res.message);
-            }
-          })
-        }
-      },
+```text
+psms/
+├─ pom.xml                              # 根 Maven 配置
+├─ README.md
+├─ LICENSE
+├─ docker-compose.yml                  # 本地开发容器编排
+├─ docker-compose-server.yml           # 服务端部署编排
+├─ db/
+│  └─ psms.sql                         # 数据库结构和基础数据
+├─ jeecg-boot-base/
+├─ jeecg-boot-module-demo/
+├─ jeecg-boot-module-system/
+│  ├─ src/main/java/org/jeecg/modules/psms/
+│  ├─ src/main/resources/
+│  └─ target/
+├─ jeecg-boot-starter/
+├─ jeecg-cloud-module/
+└─ ...
 ```
 
+## 数据库与配置
 
-## docker镜像用法
-  文档： http://doc.jeecg.com/2043889
+数据库脚本位于：
 
- ``` 
-注意： 如果本地安装了mysql和redis,启动容器前先停掉本地服务，不然会端口冲突。
-       net stop redis
-       net stop mysql
- 
- # 1.配置host
+- `db/psms.sql`
 
-    # jeecgboot
-    127.0.0.1   jeecg-boot-redis
-    127.0.0.1   jeecg-boot-mysql
-    127.0.0.1   jeecg-boot-system
-	
-# 2.修改项目配置文件 application.yml
-    active: dev
-	
-# 3.修改application-dev.yml文件的数据库和redis链接
-	修改数据库连接和redis连接，将连接改成host方式
+项目默认配置使用 MySQL 和 Redis，核心配置文件在：
 
-# 4.先进JAVA项目jeecg-boot根路径 maven打包
-    mvn clean package
- 
+- `jeecg-boot-module-system/src/main/resources/application.yml`
+- `jeecg-boot-module-system/src/main/resources/application-dev.yml`
 
-# 5.构建镜像__容器组（当你改变本地代码，也可重新构建镜像）
-    docker-compose build
+其中 `application-dev.yml` 中已配置：
 
+- 服务端口：`8080`
+- 上下文路径：`/psms`
+- MySQL：`jdbc:mysql://127.0.0.1:3306/psms`
+- Redis：`127.0.0.1:6379`
 
-# 6.启动镜像__容器组（也可取代运行中的镜像）
-    docker-compose up -d
+## 快速启动
 
-# 7.访问后台项目（注意要开启swagger）
-    http://localhost:8080/jeecg-boot/doc.html
-``` 
+### 1. 环境准备
+
+请确认已安装：
+
+- JDK 21
+- Maven 3.8+
+- MySQL 8.0
+- Redis 5.0+
+
+### 2. 初始化数据库
+
+创建数据库：
+
+```sql
+CREATE DATABASE psms CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+```
+
+导入脚本：
+
+```bash
+mysql -u root -p psms < db/psms.sql
+```
+
+### 3. 修改配置
+
+编辑：
+
+- `jeecg-boot-module-system/src/main/resources/application-dev.yml`
+
+根据本地环境更新：
+
+- 数据库用户名、密码
+- Redis 地址和密码
+- 上传目录、文件路径等必要配置
+
+### 4. 编译项目
+
+在项目根目录执行：
+
+```bash
+mvn clean package -DskipTests
+```
+
+### 5. 启动服务
+
+可直接运行后端：
+
+```bash
+java -jar jeecg-boot-module-system/target/jeecg-boot-module-system-*.jar --spring.profiles.active=dev
+```
+
+启动后访问：
+
+- 后台地址：`http://localhost:8080/psms`
+- 接口文档：`http://localhost:8080/psms/doc.html`
+
+## Docker 启动方式
+
+项目根目录提供了 Docker Compose 配置，可一键启动 MySQL、Redis 和系统服务：
+
+```bash
+docker-compose up -d
+```
+
+注意：
+
+- 如本地已有 MySQL/Redis 服务，请先确认端口未冲突
+- 容器默认端口与应用配置一致，启动后可通过 `http://localhost:8080/psms` 访问
+
+## 主要功能亮点
+
+1. 企业与测点管理
+   - 服务商、行政机构、餐饮企业、测点档案统一管理
+   - 企业定位、坐标、经营类型、排污信息一体化录入
+
+2. 实时监测与状态管理
+   - 油烟、颗粒物、非甲烷总烃等浓度数据
+   - 风机状态、净化器状态、电流、压差、流速等运行参数
+
+3. 智能分析
+   - 超标单位构成分析
+   - 超标次数分析
+   - 运行时长分析
+   - 设备联网率与数据流量统计
+
+4. 监管与告警
+   - 异常告警统计
+   - 设备未联动、停机、超标等提醒
+   - 工单流转与问题跟踪
+
+5. 综合看板
+   - 区域统计、趋势分析、月度接入情况、设备状态总览
+
+## 适用场景
+
+- 市级/区县级餐饮油烟监管平台
+- 厂商运维监控平台
+- 餐饮企业排放治理平台
+- 以排口为核心的环境监测系统
+
+## 开发说明
+
+本项目保留了 Jeecg-Boot 的低代码框架能力，并在其基础之上扩展了 PSMS 业务模块。适合在原有 Jeecg-Boot 生态中继续开发、扩展表单、菜单、角色权限和业务逻辑。
+
+如果需要新增业务功能，建议：
+
+- 在 `org.jeecg.modules.psms` 下按模块新增包
+- 复用 Jeecg 的 `Controller + Service + Mapper + Entity` 结构
+- 按业务模块维护菜单、权限和表单配置
+
+## 许可证
+
+本项目已包含 `LICENSE` 文件，使用前请确认所属许可条款。
+
+## 备注
+
+该仓库是基于 Jeecg-Boot 二次开发而成的实际业务系统，代码中已体现餐饮业油烟监控领域的业务实体和分析能力。后续若有前端源码或更完整部署文档，可按实际交付内容继续补充。
